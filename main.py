@@ -73,8 +73,8 @@ def dashboard():
 
 if __name__ == '__main__':
     # Load IPs from Excel
-    FILENAME = 'data/ip6.xlsx'
-    SHEET_NAME = 'Sheet1'
+    FILE_PATH = 'path-to-your/ip_file.xlsx'
+    SHEET_NAME = 'YourSheetName'
     df = read_excel(FILENAME, sheet_name=SHEET_NAME)
     ips = df['ip'].tolist()
 
