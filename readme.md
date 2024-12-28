@@ -66,10 +66,6 @@ The dashboard is built using Python, Flask, and MongoDB. It uses Jinja2 template
 │   ├── static/               # (Optional) For CSS/JS files
 │   ├── main.py               # Main application logic
 │   ├── utils.py              # Utility functions (e.g., file handling, database interaction)
-├── data/
-│   ├── ip6.xlsx              # Input file with IP addresses
-├── docs/
-│   └── project_documentation.pdf  # Detailed project documentation
 ├── README.md
 ├── requirements.txt          # Python dependencies
 ```
