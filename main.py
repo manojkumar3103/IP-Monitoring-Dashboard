@@ -1,6 +1,9 @@
 import os
 import re
 import datetime
+import threading
+import time
+import schedule
 from flask import Flask, render_template
 from pandas import read_excel
 import pymongo
@@ -58,8 +61,17 @@ def process_ips(ips):
 
 def save_to_mongo(collection, data):
     """Save the data to MongoDB collection."""
+    collection.delete_many({})  # Clear old data
     for idx, entry in enumerate(data, start=1):
         collection.insert_one({str(idx): entry})
+
+def scheduled_task():
+    """The task to run every hour."""
+    collection = connect_to_mongo()
+    df = read_excel(FILE_PATH, sheet_name=SHEET_NAME)
+    ips = df['ip'].tolist()
+    results = process_ips(ips)
+    save_to_mongo(collection, results)
 
 # Flask app setup
 app = Flask(__name__)
@@ -71,17 +83,24 @@ def dashboard():
     data = list(collection.find({}, {"_id": 0}))
     return render_template("dashboard.html", data=data)
 
+def run_schedule():
+    """Run the schedule in a separate thread."""
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
 if __name__ == '__main__':
-    # Load IPs from Excel
+    # File and sheet details
     FILE_PATH = 'path-to-your/ip_file.xlsx'
     SHEET_NAME = 'YourSheetName'
-    df = read_excel(FILENAME, sheet_name=SHEET_NAME)
-    ips = df['ip'].tolist()
 
-    # Process IPs and save results to MongoDB
-    collection = connect_to_mongo()
-    results = process_ips(ips)
-    save_to_mongo(collection, results)
+    # Schedule the task to run every hour
+    schedule.every(1).hours.do(scheduled_task)
+
+    # Start the scheduling thread
+    scheduler_thread = threading.Thread(target=run_schedule)
+    scheduler_thread.daemon = True
+    scheduler_thread.start()
 
     # Run the Flask app
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
