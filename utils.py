@@ -12,9 +12,13 @@ def connect_to_mongo(uri='mongodb://127.0.0.1:27017/', db_name='IP-Monitoring', 
     db = client[db_name]
     return db[collection_name]
 
-def read_ips_from_excel(file_path, sheet_name='Sheet1'):
+def read_ips_from_excel(file_path, sheet_name):
     """
     Reads IP addresses from the given Excel file.
+
+    Parameters:
+    - file_path: Path to the Excel file containing IP addresses.
+    - sheet_name: Name of the sheet within the Excel file.
     """
     df = read_excel(file_path, sheet_name=sheet_name)
     return df['ip'].values.tolist()
@@ -54,6 +58,10 @@ def ping_ip(ip):
 def process_ips(ips, mongo_collection):
     """
     Processes a list of IPs and stores their details in MongoDB.
+
+    Parameters:
+    - ips: List of IP addresses to process.
+    - mongo_collection: MongoDB collection object to store IP details.
     """
     results = []
     for index, ip in enumerate(ips):
